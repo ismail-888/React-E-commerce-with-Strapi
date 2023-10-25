@@ -1,5 +1,6 @@
 import {
   Box,
+  CircularProgress,
   Container,
   Dialog,
   IconButton,
@@ -19,13 +20,14 @@ import Button from "@mui/material/Button";
 import { AddShoppingCartOutlined, Close } from "@mui/icons-material";
 import ProductDetails from "./ProductDetails";
 import { useGetproductByNameQuery } from "../../Redux/product";
-
+import { AnimatePresence, motion } from "framer-motion";
 const Main = () => {
   const theme = useTheme();
-  
 
   const handleAlignment = (event, newValue) => {
-    setMyData(newValue)
+    if (newValue !== null) {
+      setMyData(newValue);
+    }
   };
   const [open, setOpen] = useState(false);
 
@@ -45,18 +47,28 @@ const Main = () => {
 
   const { data, error, isLoading } = useGetproductByNameQuery(myData);
 
-  if (data) {
-    console.log(data.data);
-  }
+  const [clickedProduct, setClickedProduct] = useState();
+
+  // if (data) {
+  //   console.log(data.data);
+  // }
 
   if (isLoading) {
     return (
-      <Typography variant="h6">LOADING........................</Typography>
+      <Box sx={{ py: 11, textAlign: "center" }}>
+        <CircularProgress />
+      </Box>
     );
   }
 
   if (error) {
-    return <Typography variant="h6">{error.message}</Typography>;
+    console.log(error);
+    return (
+      <Container sx={{ py: 11, textAlign: "center" }}>
+        <Typography variant="h6">{error.error}</Typography>
+        <Typography variant="h6">Please try again later</Typography>
+      </Container>
+    );
   }
 
   if (data) {
@@ -118,7 +130,6 @@ const Main = () => {
             >
               Women category
             </ToggleButton>
-
           </ToggleButtonGroup>
         </Stack>
 
@@ -127,9 +138,15 @@ const Main = () => {
           flexWrap={"wrap"}
           justifyContent={"space-between"}
         >
+          <AnimatePresence>
           {data.data.map((item) => {
             return (
               <Card
+                component={motion.section}
+                layout
+                initial={{ transform: "scale(0)" }}
+                animate={{ transform: "scale(1)" }}
+                transition={{duration:.6,type:"spring",stiffness:50}}
                 key={item.id}
                 sx={{
                   maxWidth: 333,
@@ -143,9 +160,7 @@ const Main = () => {
               >
                 <CardMedia
                   sx={{ height: 277 }}
-                  image={`${
-                    item.attributes.productImg.data[0].attributes.url
-                  }`}
+                  image={`${item.attributes.productImg.data[0].attributes.url}`}
                   title="green iguana"
                 />
 
@@ -171,13 +186,17 @@ const Main = () => {
 
                 <CardActions sx={{ justifyContent: "space-between" }}>
                   <Button
-                    onClick={handleClickOpen}
+                    onClick={() => {
+                      handleClickOpen(), setClickedProduct(item);
+                      //  console.log(item)
+                    }}
                     sx={{ textTransform: "capitalize" }}
                     size="large"
                   >
                     <AddShoppingCartOutlined sx={{ mr: 1 }} fontSize="small" />
                     add to cart
                   </Button>
+
                   <Rating
                     name="read-only"
                     value={item.attributes.productRating}
@@ -188,6 +207,8 @@ const Main = () => {
               </Card>
             );
           })}
+          </AnimatePresence>
+
         </Stack>
 
         <Dialog
@@ -208,7 +229,7 @@ const Main = () => {
           >
             <Close />
           </IconButton>
-          <ProductDetails />
+          <ProductDetails clickedProduct={clickedProduct} />
         </Dialog>
       </Container>
     );

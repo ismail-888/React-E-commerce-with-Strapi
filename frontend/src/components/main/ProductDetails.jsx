@@ -1,7 +1,14 @@
+/* eslint-disable react/prop-types */
 import { AddShoppingCartOutlined } from "@mui/icons-material";
 import { Box, Button, Stack, Typography } from "@mui/material";
+import { useState } from "react";
+import ToggleButton from "@mui/material/ToggleButton";
+import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 
-const ProductDetails = () => {
+const ProductDetails = ({ clickedProduct }) => {
+  const [selectedImg, setSelectedImg] = useState(0);
+  // console.log(clickedProduct.attributes.productImg.data[0].attributes.url)
+
   return (
     <Box
       sx={{
@@ -11,25 +18,31 @@ const ProductDetails = () => {
         flexDirection: { xs: "column", sm: "row" },
       }}
     >
-      
-      <Box sx={{display:"flex"}}>
-        <img width={"300"} height={"333"} src="src\images\banner-17.jpg" alt="" />
+      <Box sx={{ display: "flex" }}>
+        <img
+          width={"322"}
+          src={
+            clickedProduct.attributes.productImg.data[selectedImg].attributes
+              .url
+          }
+          alt=""
+        />
       </Box>
 
-      <Box sx={{ textAlign: { xs: "center", sm: "left" } }}>
-        <Typography variant="h5">WOMENS FASHION </Typography>
+      <Box sx={{ py: 2, textAlign: { xs: "center", sm: "left" } }}>
+        <Typography variant="h5">
+          {clickedProduct.attributes.productTitle}{" "}
+        </Typography>
         <Typography
           my={0.4}
           fontSize={"22px"}
           color={"crimson"}
           variant="body2"
         >
-          $12.99
+          ${clickedProduct.attributes.productPrice}
         </Typography>
         <Typography variant="body1">
-          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Magnam natus
-          ea fugit labore quidem porro error? Vel facilis perspiciatis possimus
-          excepturi inventore. Eius temporibus nu
+          {clickedProduct.attributes.productDescription}
         </Typography>
 
         <Stack
@@ -38,20 +51,45 @@ const ProductDetails = () => {
           gap={1}
           my={2}
         >
-          {["src/images/banner-17.jpg", "src/images/banner-17.jpg"].map(
-            (item) => {
+          <ToggleButtonGroup
+            value={selectedImg}
+            exclusive
+            sx={{
+              ".Mui-selected": {
+                border: "1px solid royalblue !important",
+                borderRadius: "5px !important",
+                opacity: 1,
+                backgroundColor: "initial",
+              },
+            }}
+          >
+            {clickedProduct.attributes.productImg.data.map((item, index) => {
               return (
-                <img
-                  style={{ borderRadius: 3 }}
-                  height={100}
-                  width={90}
-                  key={item}
-                  src={item}
-                  alt=""
-                />
+                <ToggleButton
+                  key={item.id}
+                  value={index}
+                  sx={{
+                    width: "110px",
+                    height: "110px",
+                    mx: 1,
+                    p: 0,
+                    opacity: ".5",
+                  }}
+                >
+                  <img
+                    onClick={() => {
+                      setSelectedImg(index);
+                    }}
+                    style={{ borderRadius: 3 }}
+                    height={"100%"}
+                    width={"100%"}
+                    src={item.attributes.url}
+                    alt=""
+                  />
+                </ToggleButton>
               );
-            }
-          )}
+            })}
+          </ToggleButtonGroup>
         </Stack>
 
         <Button
@@ -62,7 +100,6 @@ const ProductDetails = () => {
           Buy now
         </Button>
       </Box>
-
     </Box>
   );
 };

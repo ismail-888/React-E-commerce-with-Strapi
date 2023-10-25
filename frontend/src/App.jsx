@@ -16,6 +16,16 @@ function App() {
     <ColorModeContext.Provider value={colorMode}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
+
+{/* <motion.div
+initial={{opacity:0}}
+animate={{opacity:1}}
+transition={{duration:5}}
+
+className="border">
+  ali hassan
+</motion.div> */}
+
         <Header />
         <Header2 />
         <Header3 />
